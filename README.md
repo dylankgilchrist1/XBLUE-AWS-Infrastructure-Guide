@@ -44,7 +44,7 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 - Choose the desired AWS region (e.g., `us-east-1`)
 - Example CIDR block: `10.0.0.0/16`
 
-<img width="962" height="335" alt="new subnets" src="https://github.com/user-attachments/assets/9c374ef2-9131-419e-bb19-3c0dfc08dcf1" />
+<img width="988" height="763" alt="VPC" src="https://github.com/user-attachments/assets/4a867aeb-b40b-413f-b88b-60fdd95719c6" />
 
 ---
 
@@ -57,8 +57,7 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 | **Private SBC & PBX** | Private interconnect between SBC & PBX | `10.0.2.0/24` | No internet access |
 | **SBC Carrier** | Carrier/ITSP interconnect | `10.0.3.0/24` | Internet-facing via Elastic IP |
 
-<img width="1630" height="380" alt="Subnets" src="https://github.com/user-attachments/assets/0d254712-6d78-4d76-a613-f021f5bffdd6" />
-
+<img width="1630" height="380" alt="Subnets" src="https://github.com/user-attachments/assets/fefd7aeb-b883-4c50-b2fd-2bf23fcbcf71" />
 
 ---
 
@@ -66,7 +65,7 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 - Public subnets route to the **Internet Gateway (IGW)**  
 - Private subnets route **only within the VPC**
 
-<img width="1316" height="325" alt="Route Table" src="https://github.com/user-attachments/assets/782f04f0-8069-4c04-b001-5d93d95e51a6" />
+<img width="1316" height="325" alt="Route Table" src="https://github.com/user-attachments/assets/e7b2a23e-b445-4c8b-86be-1f950223c7d4" />
 
 ---
 
@@ -89,9 +88,7 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 ## Step 4: Create Security Groups
 
 > Each subnet and instance gets its own Security Group (SG) for fine-grained traffic control.
-
-<img width="1684" height="265" alt="SGSSSSSSS" src="https://github.com/user-attachments/assets/07ffcf6a-b73f-43ac-aaea-0190a7315ba2" />
-
+<img width="1684" height="265" alt="SGSSSSSSS" src="https://github.com/user-attachments/assets/a9eb5b76-76f6-40f7-97d4-8522c111acae" />
 
 ---
 
@@ -185,24 +182,21 @@ For SBC web/CLI administration only.
 <td style="border:none; vertical-align:top; width:60%; padding-right:25px;">
 
 1. Launch a **Debian 12 EC2 instance**
-   - Select Debian 12 AMI  
-   - Name: **PBX**  
-   - **Type:** `m5.large` (minimum for multi-tenant)  
-   - **Storage:** 20+ GB gp3  
-   - **Subnet:** Private SBC & PBX  
-   - **Do Not** assign Public IPv4 address  
-   - Attach the Private PBX **Security Group (SG)**  
-   - Assign an **SSH key pair** for secure CLI access  
+   - Select **Debian 12 AMI**
+   - **Name:** `PBX`
+   - **Type:** `m5.large` *(minimum for multi-tenant environments)*
+   - **Storage:** `20+ GB gp3`
+   - **Subnet:** Private SBC & PBX
+   - **Do not** assign a Public IPv4 address
+   - Attach the **Private PBX Security Group (SG)**
+   - Assign an **SSH key pair** for secure CLI access
 
 </td>
 <td style="border:none; vertical-align:top; width:40%;">
-<img src="https://github.com/user-attachments/assets/4382a12b-b344-446d-811d-31391198f06c" width="350">
+<img src="https://github.com/user-attachments/assets/489ff23e-c799-4b57-bf97-2427a58eb231" width="350" alt="VitalPBX EC2 Launch Screenshot">
 </td>
 </tr>
 </table>
-
-
-
 
 2. Connect to the VPC via SSH and install VitalPBX:
    ```bash
@@ -221,8 +215,7 @@ For SBC web/CLI administration only.
 - **Storage:** `40 GB gp3`  
 - **VPC / AZ:** same as VitalPBX
 
-  <img width="885" height="373" alt="Screenshot 2025-10-23 003827" src="https://github.com/user-attachments/assets/b725081e-2d7a-4cf9-a2e5-24bd0f4cc079" />
-
+<img width="885" height="373" alt="Screenshot 2025-10-23 003827" src="https://github.com/user-attachments/assets/0442ed82-b4a3-4a79-bca2-18f12393ba32" />
 
 ---
 
@@ -235,8 +228,7 @@ For SBC web/CLI administration only.
 | `eth2` | Private SBC & PBX | Internal PBX trunk |
 | `eth3` | SBC Carrier | Carrier / ITSP trunk |
 
-<img width="1107" height="784" alt="aaaaaaaaaaaa" src="https://github.com/user-attachments/assets/3aa1e8b4-c1aa-4687-9113-c9fe232cc40c" />
-
+<img width="1107" height="784" alt="aaaaaaaaaaaa" src="https://github.com/user-attachments/assets/d9b8d8ff-acb2-4459-8c45-5ee20f2e35b5" />
 
 ---
 
@@ -249,8 +241,8 @@ For SBC web/CLI administration only.
 ## Step 6: Assign Elastic IPs to Public Interfaces
 - In AWS, under elastic IPs Select Allocate IP addresses
 - Then assign the Public Elastic IPs to the desired Public Interfaces
-<img width="1711" height="200" alt="aaaaaaaaaaaaaaaa" src="https://github.com/user-attachments/assets/a8103a99-0dce-40c3-8e44-4d5556ae77e7" />
 
+<img width="1711" height="200" alt="aaaaaaaaaaaaaaaa" src="https://github.com/user-attachments/assets/07e3c9d9-cd8d-42f5-b293-995432db4cf9" />
 
 
 ---
