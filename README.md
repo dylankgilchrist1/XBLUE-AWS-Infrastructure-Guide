@@ -311,7 +311,7 @@ flowchart LR
 ## Document Control
 
 **Title:** AWS Infrastructure Configuration — SBC + PBX Deployment  
-**Applies To:** XBLUE Product Management  
+**Applies To:**  
 **Author:** Dylan Gilchrist  
 **Last Updated:** October 2025  
 **Version:** 1.4
