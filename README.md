@@ -1,4 +1,4 @@
- AWS Infrastructure Configuration - Ribbon SBC + VitalPBX Deployment
+# AWS Infrastructure Configuration - Ribbon SBC + VitalPBX Deployment
 
 ---
 
