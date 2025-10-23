@@ -1,7 +1,5 @@
 # AWS Infrastructure Configuration - Ribbon SBC + VitalPBX Deployment
 
----
-
 ##  Overview
 This Document is to provide the infastructure preamaraters in AWS to deploy Vital PBX and Ribbon SBC in AWS 
 
