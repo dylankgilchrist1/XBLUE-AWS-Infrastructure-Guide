@@ -1,15 +1,15 @@
-# AWS Infrastructure Configuration - Ribbon SBC + VitalPBX Deployment
+# AWS Infrastructure Configuration - SBC + PBX Deployment
 
-##  Overview
-This Document is to provide the infastructure preamaraters in AWS to deploy Vital PBX and Ribbon SBC in AWS 
+## Overview
+This document provides the infrastructure parameters in AWS to deploy **_PBX** and **_SBC** in AWS.
 
-## Important Notes 
-Both the Ribbon SBC and VitalPBX are deployed within the same AWS VPC.
-This design allows the SBC and PBX to communicate securely over a private network while keeping the PBX isolated from the public internet.
+## Important Notes
+Both the SBC and PBX are deployed within the same AWS VPC.  
+This design allows the SBC and PBX to communicate securely over a private network while keeping the PBX isolated from the public internet.  
 Only the SBC exposes public interfaces for phone registration and carrier trunks.
 
-This document focuses solely on the AWS infrastructure configuration required for deployment.
-Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides for application-level setup and integration steps.
+This document focuses solely on the AWS infrastructure configuration required for deployment.  
+Please refer to the accompanying SBC and PBX configuration guides for application-level setup and integration steps.
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -24,21 +24,22 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
    - [Private PBX SG](#private-pbx-sg)
    - [SBC Management SG](#sbc-management-sg)
 7. [Step 5: EC2 Instance Deployments](#step-5-ec2-instance-deployments)
-   - [VitalPBX Instance](#vitalpbx-instance)
-   - [Ribbon SBC Instance](#ribbon-sbc-instance)
-8. [Deployment Summary](#deployment-summary)
-9. [Network Architecture Breakdown](#network-architecture-breakdown)
-   - [Logical Layout](#logical-layout)
-   - [Security Overview](#security-overview)
-   - [Network Diagram](#network-diagram)
+   - [PBX Instance](#pbx-instance)
+   - [SBC Instance](#sbc-instance)
+8. [Step 6: Assign Elastic IPs to Public Interfaces](#step-6-assign-elastic-ips-to-public-interfaces)
+9. [Deployment Summary](#deployment-summary)
 10. [Closing](#closing)
-11. [Document Control](#document-control)
+11. [Network Architecture Breakdown](#network-architecture-breakdown)
+    - [Logical Layout](#logical-layout)
+    - [Security Overview](#security-overview)
+    - [Network Diagram](#network-diagram)
+12. [Document Control](#document-control)
 
 ---
 
-##  Step 1: VPC Creation & Subnet Design
+## Step 1: VPC Creation & Subnet Design
 
-### Create a Dedicated VPC in AWS 
+### Create a Dedicated VPC in AWS
 - Choose the desired AWS region (e.g., `us-east-1`)
 - Example CIDR block: `10.0.0.0/16`
 
@@ -46,7 +47,7 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 
 ---
 
-##  Step 2: Create Four Subnets within VPC 
+## Step 2: Create Four Subnets within VPC
 
 | Subnet Name | Purpose | Example CIDR | Notes |
 |--------------|----------|--------------|-------|
@@ -67,16 +68,16 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 
 ---
 
-###  Route Table Setup
+### Route Table Setup
 
-####  Public Route Table
+#### Public Route Table
 - **Destination:** `0.0.0.0/0 → Internet Gateway`
 - **Subnet Associations:**
   - SBC Management
   - Public Phones SBC
   - SBC Carrier
 
-####  Private Route Table
+#### Private Route Table
 - **Destination:** `Local (10.0.0.0/16)`
 - **Subnet Associations:**
   - Private SBC & PBX
@@ -86,11 +87,12 @@ Please refer to the accompanying Ribbon SBC and VitalPBX configuration guides fo
 ## Step 4: Create Security Groups
 
 > Each subnet and instance gets its own Security Group (SG) for fine-grained traffic control.
+
 <img width="1684" height="265" alt="SGSSSSSSS" src="https://github.com/user-attachments/assets/a9eb5b76-76f6-40f7-97d4-8522c111acae" />
 
 ---
 
-###  SBC Carrier SG
+### SBC Carrier SG
 Handles SIP trunking and RTP media from your carrier (e.g., Bandwidth).
 
 **Inbound Rules**
@@ -108,7 +110,7 @@ Handles SIP trunking and RTP media from your carrier (e.g., Bandwidth).
 
 ---
 
-###  Phones SBC SG
+### Phones SBC SG
 Handles registration and media from remote phones.
 
 **Inbound Rules**
@@ -131,7 +133,7 @@ Handles registration and media from remote phones.
 
 ---
 
-###  Private SBC SG
+### Private SBC SG
 Used for the private interface between SBC and PBX.
 
 | Direction | Protocol | Ports | Source/Destination | Description |
@@ -141,7 +143,7 @@ Used for the private interface between SBC and PBX.
 
 ---
 
-###  Private PBX SG
+### Private PBX SG
 Used for the PBX private interface.
 
 | Direction | Protocol | Ports | Source/Destination | Description |
@@ -151,7 +153,7 @@ Used for the PBX private interface.
 
 ---
 
-###  SBC Management SG
+### SBC Management SG
 For SBC web/CLI administration only.
 
 **Inbound Rules**
@@ -174,7 +176,7 @@ For SBC web/CLI administration only.
 
 ## Step 5: EC2 Instance Deployments
 
-###  VitalPBX Instance
+### PBX Instance
 <table style="border:none; border-collapse:collapse;">
 <tr>
 <td style="border:none; vertical-align:top; width:60%; padding-right:25px;">
@@ -191,33 +193,31 @@ For SBC web/CLI administration only.
 
 </td>
 <td style="border:none; vertical-align:top; width:40%;">
-<img src="https://github.com/user-attachments/assets/489ff23e-c799-4b57-bf97-2427a58eb231" width="350" alt="VitalPBX EC2 Launch Screenshot">
+<img src="https://github.com/user-attachments/assets/489ff23e-c799-4b57-bf97-2427a58eb231" width="350" alt="PBX EC2 Launch Screenshot">
 </td>
 </tr>
 </table>
 
-2. Connect to the VPC via SSH and install VitalPBX:
+2. Connect to the VPC via SSH and install PBX:
    ```bash
    sudo su
    wget https://repo.vitalpbx.com/vitalpbx/v4.5/pbx_installer.sh
    chmod +x pbx_installer.sh
    ./pbx_installer.sh
+   ```
+## SBC Instance
 
----
-
-###  Ribbon SBC Instance
-
-#### 1️. Launch the EC2 Instance
-- **AMI:** Ribbon-provided shared image  
+### 1️. Launch the EC2 Instance
+- **AMI:** SBC-provided shared image  
 - **Instance Type:** `t3.medium` *(minimum)*  
 - **Storage:** `40 GB gp3`  
-- **VPC / AZ:** same as VitalPBX
+- **VPC / AZ:** same as PBX  
 
-<img width="885" height="373" alt="Screenshot 2025-10-23 003827" src="https://github.com/user-attachments/assets/0442ed82-b4a3-4a79-bca2-18f12393ba32" />
+<img width="885" height="373" alt="SBC EC2 Launch" src="https://github.com/user-attachments/assets/0442ed82-b4a3-4a79-bca2-18f12393ba32" />
 
 ---
 
-#### 2️. Attach Four Network Interfaces
+### 2️. Attach Four Network Interfaces
 
 | Interface | Subnet | Purpose |
 |------------|---------|----------|
@@ -226,22 +226,21 @@ For SBC web/CLI administration only.
 | `eth2` | Private SBC & PBX | Internal PBX trunk |
 | `eth3` | SBC Carrier | Carrier / ITSP trunk |
 
-<img width="1107" height="784" alt="aaaaaaaaaaaa" src="https://github.com/user-attachments/assets/d9b8d8ff-acb2-4459-8c45-5ee20f2e35b5" />
+<img width="1107" height="784" alt="SBC Network Interfaces" src="https://github.com/user-attachments/assets/d9b8d8ff-acb2-4459-8c45-5ee20f2e35b5" />
 
 ---
 
-#### 3. Attaching SGs and Selecting Key Pair
-- Attach the correct **Security Groups (SGs)** to each interface — no edits needed  
-- Assign an **SSH key pair** for secure CLI access
+### 3️. Attaching SGs and Selecting Key Pair
+- Attach the correct **Security Groups (SGs)** to each interface — no edits needed.  
+- Assign an **SSH key pair** for secure CLI access.
 
 ---
 
 ## Step 6: Assign Elastic IPs to Public Interfaces
-- In AWS, under elastic IPs Select Allocate IP addresses
-- Then assign the Public Elastic IPs to the desired Public Interfaces
+1. In AWS, go to **Elastic IPs** and select **Allocate IP addresses**.  
+2. Assign the **Public Elastic IPs** to the desired public interfaces.
 
-<img width="1711" height="200" alt="aaaaaaaaaaaaaaaa" src="https://github.com/user-attachments/assets/07e3c9d9-cd8d-42f5-b293-995432db4cf9" />
-
+<img width="1711" height="200" alt="Elastic IPs" src="https://github.com/user-attachments/assets/07e3c9d9-cd8d-42f5-b293-995432db4cf9" />
 
 ---
 
@@ -249,22 +248,21 @@ For SBC web/CLI administration only.
 
 | Component | Interfaces | Subnets | Security Group | Elastic IP | Purpose |
 |------------|-------------|----------|----------------|-------------|----------|
-| **VitalPBX** | `eth0` | Private SBC & PBX | Private PBX SG | None | PBX Service |
-| **Ribbon SBC** | `eth0–eth3` | MGMT, Phones, Private, Carrier | Matching SGs | Yes | SBC Service |
+| **PBX** | `eth0` | Private SBC & PBX | Private PBX SG | None | PBX Service |
+| **SBC** | `eth0–eth3` | MGMT, Phones, Private, Carrier | Matching SGs | Yes | SBC Service |
 
 ---
 
-# Closing 
-
+## Closing
 After completing these steps, your **AWS infrastructure is now fully deployed** — including all VPC, subnet, route table, and security group configurations necessary for operation.  
-At this stage, both the **Ribbon SBC** and **VitalPBX** instances should be launched, reachable, and correctly networked within the VPC.
+At this stage, both the **SBC** and **PBX** instances should be launched, reachable, and correctly networked within the VPC.
 
 To continue, please refer to the following configuration guides for system-level setup:
 
-- **[VitalPBX Configuration Guide](#)** -
-- **[Ribbon SBC Configuration Guide](#)** - 
-- **[Ribbon SBC HA Guide](#)** - 
-- **[Vital PBX HA Guide](#)** - 
+- **[PBX Configuration Guide](#)**  
+- **[SBC Configuration Guide](#)**  
+- **[SBC HA Guide](#)**  
+- **[PBX HA Guide](#)**  
 
 Once both platforms are configured according to their respective guides, the full **SBC–PBX–Carrier architecture** will be operational and ready for service.
 
@@ -272,7 +270,7 @@ Once both platforms are configured according to their respective guides, the ful
 
 ## Network Architecture Breakdown
 
-###  Logical Layout
+### Logical Layout
 
 | Subnet | Purpose | Example CIDR | Connected Interfaces |
 |---------|----------|--------------|----------------------|
@@ -283,7 +281,7 @@ Once both platforms are configured according to their respective guides, the ful
 
 ---
 
-##  Security Overview
+### Security Overview
 
 | Component | Inbound Access | Outbound Access |
 |------------|----------------|-----------------|
@@ -293,27 +291,28 @@ Once both platforms are configured according to their respective guides, the ful
 | **Private SBC / PBX SGs** | Full bidirectional | Internal only |
 
 ---
-##  Network Diagram
+
+### Network Diagram
 
 ```mermaid
 flowchart LR
     Phones["Remote Phones (Public Internet)"] -->|"SIP 5060/5061 + RTP"| SBC_PUB["SBC eth1 - Phones Subnet (10.0.1.0/24)"]
-    Carrier["ITSP / Bandwidth (Carrier Network)"] -->|"SIP Trunk"| SBC_CAR["SBC eth3 - Carrier Subnet (10.0.3.0/24)"]
+    Carrier["ITSP / SIP Trunk (Carrier Network)"] -->|"SIP Trunk"| SBC_CAR["SBC eth3 - Carrier Subnet (10.0.3.0/24)"]
 
-    SBC_PUB --> SBC["Ribbon SBC (Multi-Interface Instance)"]
+    SBC_PUB --> SBC["SBC (Multi-Interface Instance)"]
     SBC_CAR --> SBC
     SBC --> PBX_LINK["SBC eth2 - Private Subnet (10.0.2.0/24)"]
-    PBX_LINK --> PBX["VitalPBX eth0 - Private SBC & PBX Network"]
+    PBX_LINK --> PBX["PBX eth0 - Private SBC & PBX Network"]
 
     Admin["Admin Workstation (SSH / HTTPS)"] -->|"Mgmt Access"| MGMT["SBC eth0 - Management (10.0.0.0/24)"]
 
 ```
---- 
+---
+## Document Control
 
-### Document Control
-
-**Title:** AWS Infrastructure Configuration — Ribbon SBC + VitalPBX Deployment  
+**Title:** AWS Infrastructure Configuration — SBC + PBX Deployment  
 **Applies To:** XBLUE Product Management  
 **Author:** Dylan Gilchrist  
 **Last Updated:** October 2025  
 **Version:** 1.4
+
